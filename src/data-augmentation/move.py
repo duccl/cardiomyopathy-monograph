@@ -1,5 +1,6 @@
 from numpy import ndarray
 
+
 def moveVertically(image: ndarray) -> ndarray:
 	print('Moving image vertically')
 
