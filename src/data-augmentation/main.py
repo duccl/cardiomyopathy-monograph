@@ -19,8 +19,8 @@ class DataAugmentation:
     return self
 
   def move(self):
-    self.image = move.moveHorizontally(self.image)
-    self.image = move.moveVertically(self.image)
+    self.image = move.moveHorizontally(self.image, 0.5)
+    self.image = move.moveVertically(self.image, 0.75)
 
     return self
 
