@@ -16,11 +16,9 @@ def byAngle(
 		if imageCenter is None:
 			imageCenter = (width / 2, height / 2)
 
-		# Get rotation matrix based on image center and angle
 		rotationMatrix = cv2.getRotationMatrix2D(imageCenter, angle, transformationScale)
 
 		# Apply rotation based on rotation matrix
 		rotatedImage = cv2.warpAffine(image, rotationMatrix, (width, height))
 
 		return rotatedImage
-
