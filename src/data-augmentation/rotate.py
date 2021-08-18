@@ -1,15 +1,14 @@
 from typing import Tuple
 
 import cv2
-from numpy import ndarray
-
+import numpy as np
 
 def byAngle(
-    image: ndarray,
+    image: np.ndarray,
     angle: int,
     imageCenter: Tuple[int, int] = None,
     transformationScale: float = 1.0
-  ) -> ndarray:
+  ) -> np.ndarray:
     print('Rotating image')
     (height, width) = image.shape[:2]
 
