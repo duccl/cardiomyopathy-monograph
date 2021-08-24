@@ -30,7 +30,7 @@ The project dependencies are:
 You should install the project dependencies using the following command:
 
 ```shell
-$ pip install -r requirements.txt
+$ pipenv install
 ```
 
 ## Running
