@@ -4,7 +4,8 @@
 
 - [2021-08-23] Pedro - [main](https://github.com/duccl/cardiomyopathy-monograph)
 
-  - **Create CHANGELOG file to add an updates history**
+  - **Create CHANGELOG file to control the updating history**
+  - **Merge [PR](https://github.com/duccl/cardiomyopathy-monograph/pull/1)**
 
 ## v0.0.0
 
