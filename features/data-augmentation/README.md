@@ -75,15 +75,15 @@ Then you will see the generated images in some windows
 ## How it works
 
 The data augmentation feature are used to increase the volume of data that will be used to train the neural network, using the limited images base available.
-We are going to apply some morphological transformations, such as rotating and transferring the images
+We are going to apply some morphological transformations, such as rotating and moving the images
 
 ## Selected parameters
 
 ### Rotating the image
 To apply a rotation around the image, we selected an angle of 45º
 
-### Transferring the image horizontally
-To apply a horizontal transferring to the image, we selected an value of -100 units
+### Moving the image horizontally
+To apply a horizontal moving to the image, we selected a value of -100 units
 
-### Transferring the image vertically
-To apply a vartical transferring to the image, we selected an value of 30 units
+### Moving the image vertically
+To apply a vartical moving to the image, we selected a value of 30 units
