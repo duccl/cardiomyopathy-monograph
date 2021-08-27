@@ -2,10 +2,6 @@
 
 ## v0.1.1
 
-- [2021-08-26] Pedro - [main](https://github.com/duccl/cardiomyopathy-monograph)
-
-  - **Merge [Pull Request](https://github.com/duccl/cardiomyopathy-monograph/pull/5)**
-
 - [2021-08-26] Pedro - [hotfix/folder-structure](https://github.com/duccl/cardiomyopathy-monograph/tree/hotfix/folder-structure)
 
   - **Move content from features/ to src/**
@@ -15,7 +11,7 @@
 - [2021-08-23] Pedro - [main](https://github.com/duccl/cardiomyopathy-monograph)
 
   - **Create CHANGELOG file to control the updating history**
-  - **Merge [Pull Request](https://github.com/duccl/cardiomyopathy-monograph/pull/1)**
+  - **Merge [PR](https://github.com/duccl/cardiomyopathy-monograph/pull/1)**
 
 ## v0.0.0
 
