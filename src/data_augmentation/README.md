@@ -43,7 +43,7 @@ $ pipenv install
 Create a new file `.py` and add the following code block
 
 ```py
-# ./__init.py
+# ./__init__.py
 
 # import some dependencies
 from main import DataAugmentation
@@ -54,18 +54,18 @@ _image = cv2.imread('./image.png')
 
 images = []
 images.append(_image)
-augmentedImages = []
+augmented_images = []
 
 # apply data augmentation transformations to loaded image
 for image in images:
-  augmentedImages.append(image)
-  augmentedImages.append(DataAugmentation(image).move().apply())
-  augmentedImages.append(DataAugmentation(image).rotate().apply())
-  augmentedImages.append(DataAugmentation(image).rotate().move().apply())
-  augmentedImages.append(DataAugmentation(image).move().rotate().apply())
+  augmented_images.append(image)
+  augmented_images.append(DataAugmentation(image).move().apply())
+  augmented_images.append(DataAugmentation(image).rotate().apply())
+  augmented_images.append(DataAugmentation(image).rotate().move().apply())
+  augmented_images.append(DataAugmentation(image).move().rotate().apply())
 
 # show generated images
-for index, image in enumerate(augmentedImages):
+for index, image in enumerate(augmented_images):
   cv2.imshow(str(index), image)
 cv2.waitKey(0)
 ```
