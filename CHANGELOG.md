@@ -4,6 +4,7 @@
 
 - [2021-08-26] Pedro - [hotfix/folder-structure](https://github.com/duccl/cardiomyopathy-monograph/tree/hotfix/folder-structure)
 
+  - **Create units + update README with testing instructions**
   - **Move content from features/ to src/**
 
 ## v0.1.0
