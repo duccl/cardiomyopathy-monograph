@@ -7,7 +7,7 @@ from pydicom.filereader import dcmread
 
 def get_images_paths_by_patient(patient_path:str):
     paths = []
-    for root,folders,files in os.walk(patient_path,topdown= False):
+    for root,_,files in os.walk(patient_path,topdown= False):
         for file in files:
             path = os.path.join(root,file)
             if Path(path).is_file() and  (".dcm" in Path(path).name or "." not in Path(path).name):
@@ -30,7 +30,6 @@ def load_images_from_paths(paths):
             imgs[slice] = {}
 
         imgs[slice][time] = dcm.pixel_array # image array
-    _imgs = imgs
     return imgs
 
 def get_time_size(paths,images):
