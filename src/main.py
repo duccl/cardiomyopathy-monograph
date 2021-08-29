@@ -17,7 +17,7 @@ def main():
     patients_metadata,_ = get_patients_metadata()
     print('METADATA OK!')
 
-    for patient_metadata in patients_metadata[:1]:
+    for patient_metadata in patients_metadata:
         download_patient_data(patient_metadata)
         print(f'{patient_metadata.patient_number} DOWNLOAD METADATA OK!')
 
