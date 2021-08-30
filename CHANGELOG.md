@@ -1,5 +1,12 @@
 # Change Log
 
+## v0.1.1
+
+- [2021-08-26] Pedro - [hotfix/folder-structure](https://github.com/duccl/cardiomyopathy-monograph/tree/hotfix/folder-structure)
+
+  - **Create units + update README with testing instructions**
+  - **Move content from features/ to src/**
+
 ## v0.1.0
 
 - [2021-08-23] Pedro - [main](https://github.com/duccl/cardiomyopathy-monograph)

@@ -7,12 +7,12 @@ class DataAugmentation:
   def __init__(self, image: np.ndarray = None):
     self.image = image
 
-  def withImage(self, image: np.ndarray):
+  def with_image(self, image: np.ndarray):
     self.image = image
     return self
 
   def rotate(self):
-    self.image = rotate.byAngle(self.image, 45)
+    self.image = rotate.by_angle(self.image, 45)
     return self
 
   def move(self):
