@@ -18,6 +18,14 @@ def main():
     print('METADATA OK!')
 
     for patient_metadata in patients_metadata:
+
+        if os.path.exists(os.path.join(home_path,patient_metadata.folder_name)):
+            continue
+
+        if patient_metadata.patient_number not in roi_locations:
+            print(f'WARN - {patient_metadata.patient_number} NOT IN ROI_LOCATIONS')
+            continue
+
         download_patient_data(patient_metadata)
         print(f'{patient_metadata.patient_number} DOWNLOAD METADATA OK!')
 
