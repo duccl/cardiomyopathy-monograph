@@ -8,6 +8,7 @@ scikit-image = "*"
 scipy = "*"
 numpy = "*"
 opencv-python = "*"
+natsort = "*"
 
 [dev-packages]
 
