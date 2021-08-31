@@ -9,6 +9,7 @@ scipy = "*"
 numpy = "*"
 opencv-python = "*"
 natsort = "*"
+pydicom = "*"
 
 [dev-packages]
 
