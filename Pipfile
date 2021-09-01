@@ -10,6 +10,9 @@ numpy = "*"
 opencv-python = "*"
 natsort = "*"
 pydicom = "*"
+keras = "*"
+tensorflow = "*"
+pydot = "*"
 
 [dev-packages]
 
