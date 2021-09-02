@@ -1,5 +1,6 @@
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
+from tensorflow.keras.applications.resnet import ResNet101
 
 def unet(pretrained_weights= None, input_size = (256,256,1)):
     inputs = Input(input_size)
@@ -51,3 +52,26 @@ def unet(pretrained_weights= None, input_size = (256,256,1)):
     	model.load_weights(pretrained_weights)
 
     return model
+
+
+def resnet101_modfied(input_size = (256,256,1)):
+    assert len(input_size) == 3
+
+    model_resnet  = ResNet101(
+        include_top =True,
+        weights= None,
+        input_shape=input_size, 
+        classes=input_size[0]*input_size[1],
+        classifier_activation = 'sigmoid'
+    )
+    
+    for layer in model_resnet.layers:
+        if isinstance(layer,Conv2D):
+            layer.activation = LeakyReLU(alpha=0.01)
+
+    predictions = Reshape((input_size[0],input_size[1],input_size[2]))(model_resnet.layers[-1].output)
+    modified_model = Model(inputs=model_resnet.input,outputs = predictions)
+    
+
+    modified_model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+    return modified_model
