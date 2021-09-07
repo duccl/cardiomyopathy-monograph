@@ -1,6 +1,7 @@
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications.resnet import ResNet101
+from tensorflow.keras.initializers import HeNormal
 
 def unet(pretrained_weights= None, input_size = (256,256,1)):
     
@@ -77,5 +78,5 @@ def resnet101_modfied(input_size = (256,256,1), num_classes = 3):
     modified_model = Model(inputs=model_resnet.input,outputs = last)
 
     modified_model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
-    
+
     return modified_model
