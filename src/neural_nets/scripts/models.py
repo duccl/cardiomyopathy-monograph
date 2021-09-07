@@ -2,6 +2,8 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model
 from tensorflow.keras.applications.resnet import ResNet101
 from tensorflow.keras.initializers import HeNormal
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers.schedules import *
 
 def unet(pretrained_weights= None, input_size = (256,256,1)):
     
@@ -68,15 +70,23 @@ def resnet101_modfied(input_size = (256,256,1), num_classes = 3):
     
     
     for layer in model_resnet.layers:
-        if isinstance(layer,Conv2D):
+        if hasattr(layer,'activation'):
             layer.activation = LeakyReLU(alpha=0.01)
+
+        if isinstance(layer,Conv2D):
             layer.kernel_initializer = HeNormal()
     
     
     predictions = Reshape((input_size[0],input_size[1],3))(model_resnet.layers[-1].output)
     last = Conv2D(3, 1, activation = 'softmax')(predictions)
     modified_model = Model(inputs=model_resnet.input,outputs = last)
+    
+    lr_schedule = ExponentialDecay(
+        initial_learning_rate=1e-2,
+        decay_steps=100,
+        decay_rate=0.9
+    )
 
-    modified_model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+    modified_model.compile(optimizer = Adam(learning_rate=lr_schedule), loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
     return modified_model
