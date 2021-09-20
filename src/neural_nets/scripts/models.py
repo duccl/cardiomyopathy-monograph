@@ -1,11 +1,12 @@
 from tensorflow.keras.layers import *
-from tensorflow.keras.models import Model
-from tensorflow.keras.applications.resnet import ResNet101
-from tensorflow.keras.initializers import HeNormal
-from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.optimizers.schedules import *
 import segmentation_models as sm
 from customMetrics import CustomMeanIOU
+import numpy as np
+import tensorflow as tf
+
+SM_FRAMEWORK=tf.keras
+INPUT_SHAPE = (None,None,1)
 
 def unet_backbone_resnet34_jaccard_loss():
     unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
