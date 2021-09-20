@@ -4,89 +4,174 @@ from tensorflow.keras.applications.resnet import ResNet101
 from tensorflow.keras.initializers import HeNormal
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.optimizers.schedules import *
+import segmentation_models as sm
+from customMetrics import CustomMeanIOU
 
-def unet(pretrained_weights= None, input_size = (256,256,1)):
-    
-    inputs = Input(input_size)
-    conv1 = Conv2D(64, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(inputs)
-    conv1 = Conv2D(64, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv1)
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
-    conv2 = Conv2D(128, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(pool1)
-    conv2 = Conv2D(128, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv2)
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-    conv3 = Conv2D(256, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(pool2)
-    conv3 = Conv2D(256, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv3)
-    pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
-    conv4 = Conv2D(512, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(pool3)
-    conv4 = Conv2D(512, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv4)
-    drop4 = Dropout(0.5)(conv4)
-    pool4 = MaxPooling2D(pool_size=(2, 2))(drop4)
+def unet_backbone_resnet34_jaccard_loss():
+    unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
 
-    conv5 = Conv2D(1024, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(pool4)
-    conv5 = Conv2D(1024, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv5)
-    drop5 = Dropout(0.5)(conv5)
-
-    up6 = Conv2D(512, 2, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(drop5))
-    merge6 = concatenate([drop4,up6], axis = 3)
-    conv6 = Conv2D(512, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(merge6)
-    conv6 = Conv2D(512, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv6)
-
-    up7 = Conv2D(256, 2, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv6))
-    merge7 = concatenate([conv3,up7], axis = 3)
-    conv7 = Conv2D(256, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(merge7)
-    conv7 = Conv2D(256, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv7)
-
-    up8 = Conv2D(128, 2, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv7))
-    merge8 = concatenate([conv2,up8], axis = 3)
-    conv8 = Conv2D(128, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(merge8)
-    conv8 = Conv2D(128, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv8)
-
-    up9 = Conv2D(64, 2, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2))(conv8))
-    merge9 = concatenate([conv1,up9], axis = 3)
-    conv9 = Conv2D(64, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(merge9)
-    conv9 = Conv2D(64, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    conv9 = Conv2D(2, 3, activation = LeakyReLU(alpha=0.01), padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    conv10 = Conv2D(3, 1, activation = 'softmax')(conv9)
-
-    model = Model(inputs=inputs, outputs=conv10)
-
-    model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
-    
-    if(pretrained_weights):
-        model.load_weights(pretrained_weights)
-
-    return model
-
-
-def resnet101_modfied(input_size = (256,256,1), num_classes = 3):
-    assert len(input_size) == 3
-    model_resnet  = ResNet101(
-        include_top =True,
-        weights= None,
-        input_shape=input_size, 
-        classes=input_size[0]*input_size[1]*num_classes,
-        classifier_activation = 'softmax'
-    )
-    
-    
-    for layer in model_resnet.layers:
+    for layer in unet_model.layers:
         if hasattr(layer,'activation'):
             layer.activation = LeakyReLU(alpha=0.01)
 
-        if isinstance(layer,Conv2D):
-            layer.kernel_initializer = HeNormal()
-    
-    
-    predictions = Reshape((input_size[0],input_size[1],3))(model_resnet.layers[-1].output)
-    last = Conv2D(3, 1, activation = 'softmax')(predictions)
-    modified_model = Model(inputs=model_resnet.input,outputs = last)
-    
-    lr_schedule = ExponentialDecay(
-        initial_learning_rate=1e-2,
-        decay_steps=100,
-        decay_rate=0.9
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+    return unet_model 
+
+def unet_backbone_resnet34_bce_jaccard_loss():
+    unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    for layer in unet_model.layers:
+      if hasattr(layer,'activation'):
+          layer.activation = LeakyReLU(alpha=0.01)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+    return unet_model 
+
+def unet_backbone_resnet34_jaccard_loss_relu():
+    unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+    return unet_model 
+
+def unet_jaccard_loss():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    for layer in unet_model.layers:
+     if hasattr(layer,'activation'):
+         layer.activation = LeakyReLU(alpha=0.01)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+    return unet_model
+
+def unet_jaccard_loss_relu():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+    return unet_model
+
+def unet_dice_loss():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    for layer in unet_model.layers:
+     if hasattr(layer,'activation'):
+         layer.activation = LeakyReLU(alpha=0.01)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.dice_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
     )
 
-    modified_model.compile(optimizer = Adam(learning_rate=lr_schedule), loss = 'categorical_crossentropy', metrics = ['accuracy'])
+    return unet_model
 
-    return modified_model
+def unet_dice_loss_relu():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.dice_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+
+    return unet_model
+
+def unet_jaccard_loss():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    for layer in unet_model.layers:
+     if hasattr(layer,'activation'):
+         layer.activation = LeakyReLU(alpha=0.01)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+
+    return unet_model
+
+def unet_bce_jaccard_loss():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    for layer in unet_model.layers:
+     if hasattr(layer,'activation'):
+         layer.activation = LeakyReLU(alpha=0.01)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+
+    return unet_model
+
+def unet_bce_jaccard_loss_relu():
+    unet_model = sm.Unet(classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.bce_jaccard_loss,
+        metrics=[CustomMeanIOU(3, dtype=np.float32),sm.metrics.f1_score],
+    )
+
+    return unet_model
+
+def unet_backbone_resnet34_dice_loss():
+    unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    for layer in unet_model.layers:
+        if hasattr(layer,'activation'):
+            layer.activation = LeakyReLU(alpha=0.01)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.dice_loss,
+        metrics=[sm.metrics.f1_score,CustomMeanIOU(3, dtype=np.float32)],
+    )
+
+    return unet_model
+
+def unet_backbone_resnet34_dice_loss_relu():
+    unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
+
+    unet_model.compile(
+        'Adam',
+        loss=sm.losses.dice_loss,
+        metrics=[sm.metrics.f1_score,CustomMeanIOU(3, dtype=np.float32)],
+    )
+
+    return unet_model
+
+MODELS = {
+    'unet_backbone_resnet34_jaccard_loss':unet_backbone_resnet34_jaccard_loss,
+    'unet_jaccard_loss':unet_jaccard_loss,
+    'unet_dice_loss':unet_dice_loss,
+    'unet_backbone_resnet34_dice_loss':unet_backbone_resnet34_dice_loss,
+    'unet_backbone_resnet34_dice_loss_relu':unet_backbone_resnet34_dice_loss_relu,
+    'unet_bce_jaccard_loss':unet_bce_jaccard_loss,
+    'unet_backbone_resnet34_jaccard_loss_relu':unet_backbone_resnet34_jaccard_loss_relu,
+    'unet_backbone_resnet34_bce_jaccard_loss':unet_backbone_resnet34_bce_jaccard_loss,
+    'unet_dice_loss_relu':unet_dice_loss_relu,
+    'unet_jaccard_loss_relu':unet_jaccard_loss_relu,
+    'unet_bce_jaccard_loss_relu':unet_bce_jaccard_loss_relu
+}
