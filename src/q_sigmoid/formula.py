@@ -1,6 +1,6 @@
 import numpy as np
 
-def q_sigmoid(image, beta = 0.3, alfa = 0.1, lamb = 0.5, q = 2):
+def qsigmoid(image, beta = 0.3, alfa = 0.1, lamb = 0.5, q = 2):
     tsallis = 1 / (1 - q)
 
     if q < 1:
