@@ -2,7 +2,7 @@ from typing import Callable
 from tensorflow.keras.layers import *
 from tensorflow.keras.optimizers.schedules import *
 import segmentation_models as sm
-from customMetrics import CustomMeanIOU
+from neural_nets.scripts.custom_metrics import CustomMeanIOU
 from tensorflow.keras.models import Model
 import numpy as np
 import tensorflow as tf
