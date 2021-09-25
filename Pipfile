@@ -13,6 +13,7 @@ pydicom = "*"
 keras = "*"
 tensorflow = "*"
 pydot = "*"
+matplotlib = "*"
 
 [dev-packages]
 
