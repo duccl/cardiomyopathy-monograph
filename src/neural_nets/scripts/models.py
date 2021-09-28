@@ -24,12 +24,8 @@ def unet_backbone_resnet34_jaccard_loss():
     )
     return unet_model
 
-def unet_backbone_resnet34_bce_jaccard_loss():
+def unet_backbone_resnet34_bce_jaccard_loss_relu():
     unet_model = sm.Unet('resnet34', classes=3, activation='softmax',input_shape=INPUT_SHAPE, encoder_weights=None)
-
-    for layer in unet_model.layers:
-      if hasattr(layer,'activation'):
-          layer.activation = LeakyReLU(alpha=0.01)
 
     unet_model.compile(
         'Adam',
@@ -173,7 +169,7 @@ MODELS: dict[str, Callable[[], Model]]  = {
     'unet_backbone_resnet34_dice_loss_relu':unet_backbone_resnet34_dice_loss_relu,
     'unet_bce_jaccard_loss':unet_bce_jaccard_loss,
     'unet_backbone_resnet34_jaccard_loss_relu':unet_backbone_resnet34_jaccard_loss_relu,
-    'unet_backbone_resnet34_bce_jaccard_loss':unet_backbone_resnet34_bce_jaccard_loss,
+    'unet_backbone_resnet34_bce_jaccard_loss_relu':unet_backbone_resnet34_bce_jaccard_loss_relu,
     'unet_dice_loss_relu':unet_dice_loss_relu,
     'unet_jaccard_loss_relu':unet_jaccard_loss_relu,
     'unet_bce_jaccard_loss_relu':unet_bce_jaccard_loss_relu
