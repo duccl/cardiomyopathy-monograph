@@ -25,7 +25,7 @@ TEST_PATH = r"D:\Development\Zigante\cardiomyopathy-monograph\SCRIPTS\test_paths
 TRAIN_PATH = r"D:\Development\Zigante\cardiomyopathy-monograph\SCRIPTS\train_paths"
 PATH_PREDS = r'D:\Development\Zigante\cardiomyopathy-monograph\PREDICOES'
 EPOCHS = 100
-BATCH_SIZE = 2
+BATCH_SIZE = 4
 TRAIN_TYPE = 'qsigmoid'
 MAX_BLACK_IMAGES = 300
 
@@ -37,7 +37,7 @@ class Loader:
     def load_incor_image(self,path):
         image = plt.imread(path)[:,:,0]
         slice_image = np.array(image)
-        slice_image = resize(slice_image, (96,96), order=0, preserve_range=True, anti_aliasing=False)
+        slice_image = resize(slice_image, (128,128), order=0, preserve_range=True, anti_aliasing=False)
         slice_image = np.nan_to_num(slice_image,0)
 
         if 'gt' in path:
@@ -59,7 +59,7 @@ class Loader:
         for _slice in range(image_array.shape[2]):
 
             slice_image = np.array(image_array[:,:,_slice])
-            slice_image = resize(slice_image, (96,96), order=0, preserve_range=True, anti_aliasing=False)
+            slice_image = resize(slice_image, (128,128), order=0, preserve_range=True, anti_aliasing=False)
 
 
             if 'gt' in path:
@@ -154,15 +154,15 @@ def get_data_train_test_paths(
 
         paths_grouped[current_patient_frame].append(str(path))
 
-    # black_images_incor = get_black_list_images_incor()
-    # for path in Path(incor_path).rglob('*.png'):
-    #     path_name = path.name
-    #     current_patient_frame = path_name.split('.')[0].split('_gt')[0]
+    black_images_incor = get_black_list_images_incor()
+    for path in Path(incor_path).rglob('*.png'):
+        path_name = path.name
+        current_patient_frame = path_name.split('.')[0].split('_gt')[0]
 
-    #     if current_patient_frame not in paths_grouped:
-    #         paths_grouped[current_patient_frame] = []
+        if current_patient_frame not in paths_grouped:
+            paths_grouped[current_patient_frame] = []
 
-    #     paths_grouped[current_patient_frame].append(str(path))
+        paths_grouped[current_patient_frame].append(str(path))
 
 
     paths = []
@@ -170,16 +170,15 @@ def get_data_train_test_paths(
     TOTAL_BLACK_IMAGES = 0
     for group_key in paths_grouped:
         record = paths_grouped[group_key]
-        # if 'png' in record[0] and record[0] not in black_images_incor: #and INCOR_MAX <= 1000:
-        #     INCOR_MAX += 1
-        #     paths.append(tuple(record))
+        if 'png' in record[0] and record[0] not in black_images_incor:
+            INCOR_MAX += 1
+            paths.append(tuple(record))
         if 'nii' in record[0]:
             paths.append(tuple(record))
         elif TOTAL_BLACK_IMAGES < MAX_BLACK_IMAGES:
             paths.append(tuple(record))
             TOTAL_BLACK_IMAGES +=1
 
-    # paths = paths[:100]
     paths_shuffle = random.sample( paths, len(paths) )
     train_index_split = int(len(paths)*train_size_percentile)
     return paths_shuffle[:train_index_split],paths_shuffle[train_index_split:]
@@ -233,7 +232,7 @@ def get_model_checkpoint(model_name):
 MODEL_TO_USE = 'unet_bce_jaccard_loss_relu'
 
 enable_memory_growth()
-train,test =  get_data_train_test_paths(acdc_path=r'D:\Documents\TCC\ac dc\training\training')
+train,test =  get_data_train_test_paths()
 train_generator, test_generator = get_generators(train,test, batch_size=BATCH_SIZE)
 
 print('DATASET OK')
