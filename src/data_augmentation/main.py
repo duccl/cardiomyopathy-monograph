@@ -2,6 +2,7 @@ from scripts.main import DataAugmentation
 import matplotlib.pyplot as plt
 from pathlib import Path
 import random
+import json
 
 ROOT_HIPERTROFICOS = r'C:\Users\duccl\INCOR\Hipertrófico'
 ROOT_NORMAL = r'C:\Users\duccl\INCOR\Normal'
@@ -9,9 +10,18 @@ ROOT_NORMAL = r'C:\Users\duccl\INCOR\Normal'
 QUANTITY_PENDING_HIPERTROFICOS = 417
 QUANTITY_PENDING_NORMAL = 143
 
+def get_black_list_images_incor():
+    with open(r'..\..\resources\black_images_incor.json') as file:
+        return set(json.load(file)['patient_black_images'])
+
 def get_samples(root_path, samples):
     _samples = {}
+    blacklist = get_black_list_images_incor()
     for path in Path(root_path).rglob('*.png'):
+
+        if path in blacklist:
+            continue
+
         path_name = path.name
         current_patient_frame = path_name.split('.')[0].split('_gt')[0]
 
