@@ -56,7 +56,6 @@ def apply_data_augmentation():
         plt.imsave(image_augmented_path,image_augmented)
         plt.imsave(gt_image_augmented_path,gt_image_augmented)
         used_paths.append(all_paths[key])
-        break
 
     save_used_paths(used_paths)
 
