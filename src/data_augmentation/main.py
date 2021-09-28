@@ -52,10 +52,11 @@ def apply_data_augmentation():
         image_augmented = DataAugmentation(image).move().rotate().apply()
         gt_image_augmented = DataAugmentation(gt_image).move().rotate().apply()
         image_augmented_path = f"{all_paths[key][0].split('.png')[0]}_data_augmentation.png"
-        gt_image_augmented_path = f"{all_paths[key][1].split('.png')[0]}_data_augmentation.png"
+        gt_image_augmented_path = f"{all_paths[key][1].split('.png')[0].split('_gt')[0]}_data_augmentation_gt.png"
         plt.imsave(image_augmented_path,image_augmented)
         plt.imsave(gt_image_augmented_path,gt_image_augmented)
         used_paths.append(all_paths[key])
+        break
 
     save_used_paths(used_paths)
 
