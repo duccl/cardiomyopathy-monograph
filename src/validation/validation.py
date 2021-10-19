@@ -1,17 +1,20 @@
 import numpy as np
 from skimage import metrics
+from medpy.metric.binary import dc
 
-def dice_coef(y_true, y_pred,smooth=1e-7):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
-    intersection = K.sum(y_true_f * y_pred_f)
-    return (2. * intersection) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
-
-def dice_index(y_true, y_pred, numLabels = 3):
-    dice=0
-    for index in range(numLabels):
-        dice += dice_coef(y_true[:,:,index], y_pred[:,:,index])
-    return dice/numLabels
+ef dice_index_medpy(gt,pred):
+    argmax_gt = np.argmax(np.copy(gt),axis=-1) 
+    argmax_pred = np.argmax(np.copy(pred),axis=-1)
+    res = []
+    for label in np.unique(argmax_gt):
+        label_gt = np.copy(argmax_gt)
+        label_pred = np.copy(argmax_pred)
+        label_gt[label_gt != label] = 0
+        label_pred[label_pred != label] = 0
+        label_gt[label_gt == label] = 1
+        label_pred[label_pred == label] = 1
+        res += [dc(label_gt,label_pred)]
+    return np.mean(res)
 
 
 def hausdorff_index(output,expected_output):
