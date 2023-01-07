@@ -114,6 +114,10 @@ class DataGenerator(tf.keras.utils.Sequence):
         return np.array(X),np.array(y)
 
 def get_black_list_images_incor():
+    if not os.path.exists('black_images_incor.json'):
+        print('[WARN] black_images_incor.json not exists! All images will be used')
+        return set()
+
     with open('black_images_incor.json') as file:
         return set(json.load(file)['patient_black_images'])
 
