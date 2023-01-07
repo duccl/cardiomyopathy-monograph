@@ -1,7 +1,7 @@
 import numpy as np
 
-import move
-import rotate
+from . import move
+from . import rotate
 
 class DataAugmentation:
   def __init__(self, image: np.ndarray = None):
